@@ -1,0 +1,512 @@
+Q1. Write a PL/SQL program to Accept Number from a User and display Hello message if the entered number is Positive.
+->
+DECLARE
+  n number;
+  BEGIN
+    n := &n;
+    if n > 0 then
+        dbms_output.put_line('Hello');
+    END IF;
+  END;
+  /
+
+Q2. Write a PL/SQL block to accept an employee's salary and determine the grade:   Salary >= 50000 -> Grade A | Salary >= 30000 -> Grade B | Salary < 30000 -> Grade C
+->
+DECLARE
+	sal int;
+BEGIN
+	sal:=&sal;
+	if sal>=50000 then
+		dbms_output.put_line('Grade A');
+	elsif sal>=30000 then
+		dbms_output.put_line('Grade B');
+	elsif sal<30000 then
+		dbms_output.put_line('Grade C');
+	end if;
+END;
+/
+
+Q3. Write a PL/SQL program to Display Salary of a specified employee increasing by 500 if its salary is more than 3000.
+->
+DECLARE
+    a INT;
+BEGIN
+    a := &a;
+    IF a > 3000 THEN
+        a := a + 500;
+        dbms_output.put_line(a);
+    END IF;
+END;
+/
+
+Q4. Write a PL/SQL program using FOR loop to insert ten rows into a database table.
+CRAETE TABLE EMP_TABLE(
+	emp_id number primary key,
+	emp_name varchar2(100)
+);
+
+DECLARE
+    v_name EMP_TABLE.emp_name%TYPE;
+BEGIN
+    FOR i IN 1..10 LOOP
+        v_name := '&name';
+        INSERT INTO EMP_TABLE(emp_id, emp_name)
+        VALUES (i, v_name);
+    END LOOP;
+    COMMIT;
+END;
+/
+
+Q5. Write a PL/SQL program to generate Fibonacci series.
+DECLARE
+    a INT := 0;
+    b INT := 1;
+    c INT;
+    i INT;
+    n INT;
+BEGIN
+    n := &n;
+    FOR i IN 1..n LOOP
+        dbms_output.put_line(a);
+        c := a + b;
+        a := b;
+        b := c;
+    END LOOP;
+END;
+/
+
+Q6. Write a PL/SQL program to get the name and salary of specified employee using %TYPE attribute.
+->
+DECLARE
+    v_name EMP_TABLE.emp_name%TYPE;
+BEGIN
+    v_name := '&name';
+    INSERT INTO EMP_TABLE(emp_id, emp_name)
+    VALUES (i, v_name);
+    COMMIT;
+END;
+/
+
+Q7. Write a PL/SQL Program to display a given number in Reverse Order.
+DECLARE
+    n int;
+    rev int := 0;
+BEGIN
+    n := &n;
+
+    WHILE n > 0 LOOP
+        rev := rev * 10 + MOD(n, 10);
+        n := n / 10;
+    END LOOP;
+
+    dbms_output.put_line('Reversed Number = ' || rev);
+END;
+/
+
+Q8. Write a PL/SQL program to take a department ID and display the department name using CASE.   10->Finance  20->HR  30->IT  40->Sales  Others->Invalid Department
+->
+DECLARE
+	a int;
+BEGIN
+	a := &a;
+	CASE a
+		when 10 then dbms_output.put_line('Finance');
+		when 20 then dbms_output.put_line('HR');
+		when 30 then dbms_output.put_line('IT');
+		when 40 then dbms_output.put_line('Sales');
+		else dbms_output.put_line('Invalid Department');
+	END CASE;
+END;
+/
+
+Q9. Write a PL/SQL program to get the name and salary of specified employee.
+DECLARE
+  n VARCHAR2(50);
+  s NUMBER;
+BEGIN
+  SELECT name, salary INTO n, s FROM employee WHERE emp_id = &id;
+  DBMS_OUTPUT.PUT_LINE(n || ' ' || s);
+END;
+/
+
+Q10. Write a PL/SQL block using a for loop to print the sum of the first 100 odd natural numbers.
+->
+DECLARE
+    v_total NUMBER := 0;
+BEGIN
+    FOR i IN 1..200 LOOP
+        IF MOD(i, 2) = 0 THEN
+            v_total := sum + i;
+        END IF;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('The Sum of vnknk :'||v_total);
+END;
+/
+
+Q11. Using procedure pass employee no and name and store into employee table.
+CREATE OR REPLACE PROCEDURE add_employee(
+    p_emp_id     IN EMP_TABLE.emp_id%TYPE,
+    p_emp_ename  IN EMP_TABLE.emp_name%TYPE
+)
+AS
+BEGIN
+    INSERT INTO EMP_TABLE(emp_id, emp_name)
+    VALUES (p_emp_id, p_emp_ename);
+
+    dbms_output.put_line('Employee added');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        dbms_output.put_line(SQLERRM);
+        ROLLBACK;
+END;
+/
+
+Q12. Create a Procedure which receives employee number and displays employee name, Designation and salary.
+CREATE OR REPLACE PROCEDURE emp_details(
+	p_emp_id IN EMP_TABLE.emp_id%TYPE
+)
+AS
+    	p_emp_ename EMP_TABLE.emp_name%TYPE
+BEGIN
+	SELECT emp_name
+	INTO p_emp_ename
+	FROM EMP_TABLE
+	WHERE emp_id = p_emp_id;
+	dbms_output.put_line('Name: ' || p_emp_ename);
+EXCEPTION
+	WHEN OTHERS THEN
+		dbms_output.put_line(SQLERRM);
+END;
+/
+
+Q13. Write a PL/SQL block which will use a user-defined procedure that accepts employee number and returns employee name and department name as OUT parameters.
+CREATE OR REPLACE PROCEDURE get_employee_details(
+    p_eid    IN  EMP_TABLE.emp_id%TYPE,
+    p_name   OUT EMP_TABLE.emp_name%TYPE,
+)
+AS
+BEGIN
+    SELECT emp_name
+    INTO p_name
+    FROM EMP_TABLE
+    WHERE emp_id = p_eid;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        dbms_output.put_line(SQLERRM);
+END;
+/
+
+Q14. Create a procedure which will accept Deptno and Display no of employees under different grade.
+->
+CREATE OR REPLACE PROCEDURE emp_details(
+	p_deptno IN NUMBER
+) IS
+BEGIN
+	FOR r IN (
+		SELECT s.grade, count(*) cnt
+		from emp e, salgrade s
+		where e.deptno = p_deptno
+		GROUP BY s.grade
+		ORDER BY s.grade
+	) LOOP 
+		DBMS_OUTPUT.PUT_LINE(r.grade || r.cnt);
+	END LOOP;
+END;
+/
+
+Q15. Write a function total_salary_dept that returns the total salary of all employees in a given department.
+->
+CREATE OR REPLACE FUNCTION total_salary_dept(
+	dno IN NUMBER
+)
+RETURN NUMBER
+IS
+	total_sal NUMBER;
+BEGIN
+	SELECT sum(sal)
+	INTO total_sal
+	FROM emp
+	where deptno = dno;
+	
+	return total_sal;
+END;
+/
+
+Q16. Create a function count_emp_dept that accepts a department ID and returns the number of employees in that department.
+->
+CREATE OR REPLACE FUNCTION count_emp_dept(
+	dno IN NUMBER
+)
+RETURN NUMBER
+IS
+	cnt NUMBER;
+BEGIN
+	SELECT count(*)
+	INTO cnt
+	FROM emp
+	where deptno = dno;
+	
+	return cnt;
+END;
+/
+
+Q17. Write a function calc_bonus that returns the bonus for an employee as 20% of salary.
+->
+CREATE OR REPLACE FUNCTION cal_bonus(
+	p_no IN NUMBER
+)
+RETURN NUMBER
+IS
+	new_sal emp.sal%type;
+BEGIN
+
+	SELECT sal
+	into new_sal
+	from emp
+	where empno = p_no;
+
+	return new_sal * 0.20;
+END;
+/
+
+
+Q18. Write a procedure show_emp that accepts an employee ID and prints: Name, Salary & DeptName.
+->
+CREATE OR REPLACE PROCEDURE show_emp(
+	e_id IN NUMBER
+) IS
+	v_name emp.ename%type;
+	v_sal emp.sal%type;
+	v_dept emp.dname%type;
+BEGIN
+	SELECT e.ename, e.sal, d.dname
+	INTO v_name, v_sal, v_dept
+	from emp e, dept d
+	where e.deptno = d.deptno
+	AND e.empno = e_id
+	
+	DBMS_OUTPUT.PUT_LINE(v_name || v_sal || v_dept);
+END;
+/
+
+Q19. Create a procedure update_salary that increases the salary of a given employee by a given percentage. Parameters: employee ID, percentage.
+->
+CREATE OR REPLACE PROCEDURE update_salary(
+	eno IN NUMBER,
+	percentage IN NUMBER
+)
+BEGIN
+	UPDATE emp
+	SET sal = sal + (sal * percent / 100)
+	where empno = eno;
+END;
+/
+
+
+Q20. Write a function calculate_age(p_emp_id NUMBER) that retrieves the employee's DOB, calculates age in years, and returns the age.
+->
+CREATE OR REPLACE FUNCTION calculate_age(
+	p_emp_id IN NUMBER
+) IS
+	v_dob DATE;
+	v_age NUMBER;
+BEGIN
+	SELECT dob
+	INTO v_dob
+	from emp
+	where empno = p_emp_id;
+
+	v_age := FLOOR(MONTHS_BETWEEN(SYSDATE, v_dob) / 12);
+
+	return v_age;
+END;
+/
+
+Assignment IV: Cursor
+Q21. Write a PL/SQL block that will display the employee details along with salary using Cursors.
+->
+DECLARE
+	CURSOR c_emp IS
+		SELECT ename, sal
+		FROM emp;
+BEGIN
+	OPEN c_emp
+		FOR r IN c_emp LOOP
+			DBMS_OUTPUT.PUT_LINE(r.name || r.sal);
+		END LOOP;
+	CLOSE c_emp;
+END;
+/
+
+Q22. Write a Cursor to display the list of employees who are working as a Manager or Analyst.
+->
+DECLARE
+	CURSOR c_emp IS
+		SELECT empno, ename, job
+		FROM emp
+		WHERE job IN ('MANAGER', 'ANALYST');
+BEGIN
+	OPEN c_emp
+		FOR r IN c_emp LOOP
+			DBMS_OUTPUT.PUT_LINE(r.empno || r.name || r.job);
+		END LOOP;
+	CLOSE c_emp;
+END;
+/
+
+Q23. Using a cursor FOR loop, increase the salary of employees in the SALES department by 10%. Also display the old salary and new salary.
+->
+DECLARE
+  CURSOR c IS SELECT * FROM employee WHERE dept_id = 30;
+BEGIN
+  FOR r IN c LOOP
+    DBMS_OUTPUT.PUT_LINE('Old Salary: ' || r.salary);
+
+    UPDATE employee 
+    SET salary = salary * 1.1 
+    WHERE emp_id = r.emp_id;
+
+    DBMS_OUTPUT.PUT_LINE('New Salary: ' || (r.salary * 1.1));
+  END LOOP;
+END;
+/
+
+Q24. Write a PL/SQL block using implicit cursor that will display message - salaries of all employees in the employee table are updated. If none of the employee's salary are updated, display 'None of the salaries were updated'. Else display 'Salaries for <n> employees are updated'.
+->
+BEGIN
+  UPDATE employee SET salary = salary + 100;
+
+  IF SQL%ROWCOUNT = 0 THEN
+    DBMS_OUTPUT.PUT_LINE('None of the salaries were updated');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' salaries updated');
+  END IF;
+END;
+/
+
+
+Q25. Given the Table Employee (EmpNo, Name, Salary, Designation, Dept_ID). Write a cursor to select the five highest paid employees from the table.
+DECLARE
+  CURSOR c IS SELECT * FROM employee ORDER BY salary DESC;
+  i NUMBER := 0;
+BEGIN
+  FOR r IN c LOOP
+    EXIT WHEN i = 5;
+    DBMS_OUTPUT.PUT_LINE(r.name || ' ' || r.salary);
+    i := i + 1;
+  END LOOP;
+END;
+/
+
+Trigger-----
+
+1.
+CREATE OR REPLACE TRIGGER trg_salary_audit
+BEFORE UPDATE OF salary ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO salary_log(emp_id, old_salary, new_salary, change_date)
+  VALUES(:OLD.emp_id, :OLD.salary, :NEW.salary, SYSDATE);
+END;
+/
+Input-------
+UPDATE employee
+SET salary = 60000
+WHERE emp_id = 1;
+
+output-----
+1 row updated.
+check------
+SELECT * FROM salary_log;
+
+2.
+CREATE OR REPLACE TRIGGER trg_no_salary_decrease
+BEFORE UPDATE OF salary ON employee
+FOR EACH ROW
+BEGIN
+  IF :NEW.salary < :OLD.salary THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Salary cannot be decreased');
+  END IF;
+END;
+/
+Input----
+UPDATE employee
+SET salary = 30000
+WHERE emp_id = 1;
+Output-----
+ERROR at line 1:
+ORA-20001: Salary cannot be decreased
+
+3.
+CREATE OR REPLACE TRIGGER trg_emp_insert
+AFTER INSERT ON employee
+FOR EACH ROW
+BEGIN
+  UPDATE department
+  SET total_emp = total_emp + 1
+  WHERE dept_id = :NEW.dept_id;
+END;
+/
+Delete Tigger----
+CREATE OR REPLACE TRIGGER t_del
+AFTER DELETE ON employee
+FOR EACH ROW
+BEGIN
+  UPDATE department 
+  SET total_emp = total_emp - 1
+  WHERE dept_id = :OLD.dept_id;
+END;
+/
+Input-----
+INSERT INTO employee VALUES (5,'Amit',30000,10);
+Output-----
+1 row inserted.
+(total_emp increased)
+
+4.
+CREATE OR REPLACE TRIGGER t_backup
+BEFORE DELETE ON employee
+FOR EACH ROW
+BEGIN
+  INSERT INTO employee_backup
+  VALUES(:OLD.emp_id,:OLD.name,:OLD.salary,:OLD.dept_id);
+END;
+/
+Input-----
+DELETE FROM employee WHERE emp_id=2;
+Output----
+1 row deleted.
+(record stored in backup table)
+
+5.
+CREATE OR REPLACE TRIGGER t_email
+BEFORE INSERT ON student
+FOR EACH ROW
+DECLARE c NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO c FROM student WHERE email=:NEW.email;
+  IF c>0 THEN
+    RAISE_APPLICATION_ERROR(-20001,'duplicate email');
+  END IF;
+END;
+/
+Input----
+INSERT INTO student VALUES(2,'Rahul','rahul@gmail.com');
+Ouput----
+ORA-20001: duplicate email
+
+6.
+CREATE OR REPLACE TRIGGER t_time
+BEFORE UPDATE OF price ON product
+FOR EACH ROW
+BEGIN
+  :NEW.last_updated := SYSDATE;
+END;
+/
+Input-------
+UPDATE product SET price=500 WHERE product_id=1;
+Ouput------
+1 row updated.
+(last_updated changed to current date)
